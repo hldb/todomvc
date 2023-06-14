@@ -3,6 +3,8 @@ import { defineConfig } from "cypress";
 export default defineConfig({
   viewportWidth: 890,
   numTestsKeptInMemory: 1,
+  video: false,
+  screenshotOnRunFailure: false,
 
   e2e: {
     setupNodeEvents(on, config) {

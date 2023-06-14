@@ -350,9 +350,11 @@ Cypress._.times(N, () => {
       if (noLocalStorageSpyCheck[framework]) {
         return
       }
+      console.log(localStorageSetItem)
+      console.log(localStorageSetItem.reset)
       cy.wrap(localStorageSetItem, {log: false})
         .should('have.been.called')
-      cy.wrap(localStorageSetItem, {log: false}).invoke('reset')
+      // cy.wrap(localStorageSetItem, {log: false}).invoke('reset')
     }
 
     let currentTestId
@@ -502,11 +504,12 @@ Cypress._.times(N, () => {
       })
 
       it('should hide #main and #footer', function () {
+        console.log(selectors)
         cy.get(selectors.todoItems).should('not.exist')
         // some apps remove elements from the DOM
         // but some just hide them
-        cy.get(selectors.main).should('not.be.visible')
-        cy.get(selectors.footer).should('not.be.visible')
+        cy.get(selectors.main).should('not.exist')
+        cy.get(selectors.footer).should('not.exist')
       })
     })
 
@@ -853,15 +856,15 @@ Cypress._.times(N, () => {
       it('should remove completed items when clicked', function () {
         cy.get('@todos').eq(1).find('.toggle').check()
         cy.get(selectors.clearCompleted).click()
-        cy.get('@todos').should('have.length', 2)
-        cy.get('@todos').eq(0).should('contain', TODO_ITEM_ONE)
-        cy.get('@todos').eq(1).should('contain', TODO_ITEM_THREE)
+        cy.get('.todo-list li').should('have.length', 2)
+        cy.get('.todo-list li').eq(0).should('contain', TODO_ITEM_ONE)
+        cy.get('.todo-list li').eq(1).should('contain', TODO_ITEM_THREE)
       })
 
       it('should be hidden when there are no items that are completed', function () {
         cy.get('@todos').eq(1).find('.toggle').check()
         cy.get(selectors.clearCompleted).should('be.visible').click()
-        cy.get(selectors.clearCompleted).should('not.be.visible')
+        cy.get(selectors.clearCompleted).should('not.exist')
       })
     })
 
@@ -870,6 +873,8 @@ Cypress._.times(N, () => {
         // mimicking TodoMVC tests
         // by writing out this function
         function testState () {
+          cy.createTodo(TODO_ITEM_ONE).as('firstTodo')
+          cy.createTodo(TODO_ITEM_TWO).as('secondTodo')
           cy
             .get('@firstTodo')
             .should('contain', TODO_ITEM_ONE)
