@@ -177,6 +177,7 @@ class TodoApp extends React.Component<IAppProps, IAppState> {
 var model = new TodoModel('react-todos');
 
 function render() {
+  console.log('render')
   ReactDOM.render(
     <TodoApp model={model}/>,
     document.getElementsByClassName('todoapp')[0]

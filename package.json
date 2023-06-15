@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "./node_modules/typescript/bin/tsc -p ./js/ && node ./node_modules/browserify/bin/cmd ./js/app.js -o ./js/bundle.js",
+    "build": "tsc && node ./node_modules/browserify/bin/cmd ./dist/src/app.js -o ./dist/bundle.js",
     "start": "node ./serve.js",
     "test": "cypress run --browser chrome"
   },

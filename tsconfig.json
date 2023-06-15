@@ -1,3 +1,24 @@
 {
-  "extends": "./js/tsconfig.json"
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "dist/src"
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [],
+    "baseUrl": "types",
+    "typeRoots": ["types"]
 }
