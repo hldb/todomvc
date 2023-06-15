@@ -6,7 +6,7 @@
 
 /// <reference path="./interfaces.d.ts"/>
 
-declare var Router;
+import { Router } from 'director/build/director.js';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { TodoFooter } from "./footer";
