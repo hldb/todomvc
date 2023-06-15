@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "tsc && node ./node_modules/browserify/bin/cmd ./dist/src/app.js -o ./dist/bundle.js",
-    "start": "node ./serve.js",
+    "serve": "http-server . -a 127.0.0.1 -p 4200",
     "test": "cypress run --browser chrome"
   },
   "dependencies": {
@@ -20,7 +20,7 @@
   "devDependencies": {
     "browserify": "^16.2.3",
     "cypress": "^12.14.0",
-    "node-static": "^0.7.11",
+    "http-server": "^14.1.1",
     "typescript": "^3.9.10"
   }
 }
