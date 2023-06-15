@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc && node ./node_modules/browserify/bin/cmd ./dist/src/app.js -o ./dist/bundle.js",
     "serve": "http-server . -a 127.0.0.1 -p 4200",
-    "test": "cypress run --browser chrome"
+    "test": "npm run build && cypress run --browser chrome"
   },
   "dependencies": {
     "@types/classnames": "^2.2.6",
