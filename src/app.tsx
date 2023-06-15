@@ -9,12 +9,11 @@
 declare var Router;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TodoModel } from "./todoModel";
 import { TodoFooter } from "./footer";
 import { TodoItem } from "./todoItem";
 import { ALL_TODOS, ACTIVE_TODOS, COMPLETED_TODOS, ENTER_KEY } from "./constants";
 
-class TodoApp extends React.Component<IAppProps, IAppState> {
+export class TodoApp extends React.Component<IAppProps, IAppState> {
 
   public state : IAppState;
 
@@ -173,15 +172,3 @@ class TodoApp extends React.Component<IAppProps, IAppState> {
     );
   }
 }
-
-var model = new TodoModel('react-todos');
-
-function render() {
-  ReactDOM.render(
-    <TodoApp model={model}/>,
-    document.getElementsByClassName('todoapp')[0]
-  );
-}
-
-model.subscribe(render);
-render();

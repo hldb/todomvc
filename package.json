@@ -22,5 +22,17 @@
     "cypress": "^12.14.0",
     "http-server": "^14.1.1",
     "typescript": "^3.9.10"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
