@@ -14,19 +14,21 @@
     "classnames": "^2.2.6",
     "cli-progress": "^3.12.0",
     "director": "^1.2.0",
+    "helia": "^1.3.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "shelljs": "^0.8.5",
     "tar": "^6.1.15",
     "todomvc-app-css": "^2.0.0",
-    "todomvc-common": "^1.0.1"
+    "todomvc-common": "^1.0.1",
+    "welo": "^1.1.0-704bcf0"
   },
   "devDependencies": {
     "browserify": "^16.2.3",
     "cypress": "^12.14.0",
     "http-server": "^14.1.1",
     "react-scripts": "^5.0.1",
-    "typescript": "^3.9.10"
+    "typescript": "^4.9.5"
   },
   "homepage": "./",
   "browserslist": {
