@@ -18,7 +18,6 @@ import { multiaddr } from '@multiformats/multiaddr'
 import type { PubSub } from '@libp2p/interface-pubsub'
 import type { Libp2pOptions } from 'libp2p'
 
-
 // this list comes from https://github.com/ipfs/kubo/blob/da28fbc65a2e0f1ce59f9923823326ae2bc4f713/config/bootstrap_peers.go#L17
 const bootstrapConfig = {
   list: [
