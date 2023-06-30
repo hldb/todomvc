@@ -3,4 +3,5 @@ dist
 build
 cypress/screenshots
 cypress/videos
+kubo
 
