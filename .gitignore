@@ -3,5 +3,6 @@ dist
 build
 cypress/screenshots
 cypress/videos
-.env
-
+test/kubo/*
+!test/kubo.js
+!test/kubo/
