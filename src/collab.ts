@@ -8,6 +8,7 @@ import type { Libp2p } from 'libp2p'
 import type { Helia } from '@helia/interface'
 import { libp2pDefaults } from './libp2p-defaults'
 import { multiaddr } from '@multiformats/multiaddr';
+import { peerIdFromString } from '@libp2p/peer-id'
 
 const token = process.env.REACT_APP_W3_TOKEN
 let started = false
@@ -19,11 +20,13 @@ declare global {
     welo: Welo,
     manifest: Manifest,
     db: Database,
-    multiaddr: any
+    multiaddr: any,
+    peerIdFromString: any
   }
 }
 
 window.multiaddr = multiaddr
+window.peerIdFromString = peerIdFromString
 
 let 
   helia: Helia<any>,
@@ -40,8 +43,8 @@ export function subscribe (render: () => void) {
 // let first = true
 
 export async function start (): Promise<void> {
-  libp2p = await createLibp2p(libp2pDefaults())
-  helia = await createHelia()
+  libp2p = await createLibp2p(await libp2pDefaults())
+  helia = await createHelia({ libp2p })
   // libp2p.addEventListener('self:peer:update', (event) => {
   //   console.log('addrs')
   //   console.log(libp2p.getMultiaddrs())
@@ -75,7 +78,7 @@ export async function start (): Promise<void> {
 
 
   window.helia = helia
-  window.libp2p = helia.libp2p
+  window.libp2p = libp2p
   window.welo = welo
   window.manifest = manifest
   window.db = db
