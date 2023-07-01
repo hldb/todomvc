@@ -5,6 +5,7 @@
 
 /// <reference path="./interfaces.d.ts"/>
 
+import * as collab from './collab'
 import { Utils } from "./utils";
 
 // Generic "model" object. You can use whatever
@@ -34,11 +35,14 @@ class TodoModel implements ITodoModel {
   }
 
   public addTodo(title : string) {
-    this.todos = this.todos.concat({
+    const todo = {
       id: Utils.uuid(),
       title: title,
       completed: false
-    });
+    }
+    this.todos = this.todos.concat(todo);
+
+    void collab.putTodos([todo])
 
     this.inform();
   }
@@ -48,19 +52,28 @@ class TodoModel implements ITodoModel {
     // easier to reason about and React works very well with them. That's why
     // we use map(), filter() and reduce() everywhere instead of mutating the
     // array or todo items themselves.
-    this.todos = this.todos.map<ITodo>((todo : ITodo) => {
+    const todos = this.todos.map<ITodo>((todo : ITodo) => {
       return Utils.extend({}, todo, {completed: checked});
     });
+    this.todos = todos
+
+    void collab.putTodos(todos)
 
     this.inform();
   }
 
   public toggle(todoToToggle : ITodo) {
+    let toggled: ITodo
     this.todos = this.todos.map<ITodo>((todo : ITodo) => {
-      return todo !== todoToToggle ?
-        todo :
-        Utils.extend({}, todo, {completed: !todo.completed});
+      if (todo !== todoToToggle) {
+        return todo
+      } else {
+        toggled = Utils.extend({}, todo, {completed: !todo.completed});
+        return toggled
+      }
     });
+
+    void collab.putTodos([toggled])
 
     this.inform();
   }
@@ -70,21 +83,34 @@ class TodoModel implements ITodoModel {
       return candidate !== todo;
     });
 
+    void collab.delTodos([todo])
+
     this.inform();
   }
 
   public save(todoToSave : ITodo, text : string) {
+    let saved: ITodo
     this.todos = this.todos.map(function (todo) {
-      return todo !== todoToSave ? todo : Utils.extend({}, todo, {title: text});
+      if (todo !== todoToSave) {
+        return todo
+      } else {
+        saved = Utils.extend({}, todo, {title: text});
+        return saved
+      }
     });
+
+    void collab.putTodos([saved])
 
     this.inform();
   }
 
   public clearCompleted() {
+    const completed = this.todos.filter(todo => todo.completed)
     this.todos = this.todos.filter(function (todo) {
       return !todo.completed;
     });
+
+    void collab.delTodos(completed)
 
     this.inform();
   }

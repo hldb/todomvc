@@ -10,6 +10,7 @@ import { libp2pDefaults } from './libp2p-defaults'
 import { multiaddr } from '@multiformats/multiaddr';
 
 const token = process.env.REACT_APP_W3_TOKEN
+let started = false
 
 declare global {
   interface Window {
@@ -78,6 +79,39 @@ export async function start (): Promise<void> {
   window.welo = welo
   window.manifest = manifest
   window.db = db
+
+  started = true
+  void putTodos(prestart.put)
+  void delTodos(prestart.del)
+}
+
+const prestart: { put: ITodo[], del: ITodo[] } = {
+  put: [],
+  del: []
+}
+
+export async function putTodos (todos: ITodo[]): Promise<void> {
+  if (started === false)  {
+    prestart.put.push(...todos)
+    return
+  }
+
+  for (const todo of todos) {
+    const payload = db.store.creators.put(todo.id, todo)
+    void db.replica.write(payload)
+  }
+}
+
+export async function delTodos (todos: ITodo[]): Promise<void> {
+  if (started === false)  {
+    prestart.del.push(...todos)
+    return
+  }
+
+  for (const todo of todos) {
+    const payload = db.store.creators.del(todo.id, todo)
+    void db.replica.write(payload)
+  }
 }
 
 // async function download () {
