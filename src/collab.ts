@@ -6,7 +6,7 @@ import { zzzyncReplicator, ZzzyncReplicator } from 'welo/dist/src/replicator/zzz
 import { Web3Storage } from 'web3.storage'
 import type { Libp2p } from 'libp2p'
 import type { Helia } from '@helia/interface'
-import { libp2pDefaults } from './libp2p-defaults'
+import { createLibp2pOptions } from './libp2p-options'
 import { multiaddr } from '@multiformats/multiaddr';
 import { peerIdFromString } from '@libp2p/peer-id'
 
@@ -21,7 +21,8 @@ declare global {
     manifest: Manifest,
     db: Database,
     multiaddr: any,
-    peerIdFromString: any
+    peerIdFromString: any,
+    client: any
   }
 }
 
@@ -43,7 +44,7 @@ export function subscribe (render: () => void) {
 // let first = true
 
 export async function start (): Promise<void> {
-  libp2p = await createLibp2p(await libp2pDefaults())
+  libp2p = await createLibp2p(createLibp2pOptions())
   helia = await createHelia({ libp2p })
   // libp2p.addEventListener('self:peer:update', (event) => {
   //   console.log('addrs')
@@ -56,7 +57,7 @@ export async function start (): Promise<void> {
   welo = await createWelo({
     ipfs: helia,
     replicators: [
-      // liveReplicator(),
+      liveReplicator(),
       // zzzyncReplicator({
       //   w3: { client: new Web3Storage({ token }) },
       //   createEphemeralLibp2p: () => helia.libp2p // fine because there is only one database to replicate

@@ -20,6 +20,8 @@ import type { Libp2pOptions } from 'libp2p'
 import type { ConnectionGater } from '@libp2p/interface-connection-gater'
 import { type Controller, createController } from 'ipfsd-ctl'
 import * as kuboRpcClient from 'kubo-rpc-client'
+// import { pubsubPeerDiscovery } from '@libp2p/pubsub-peer-discovery'
+import { webRTCStar } from '@libp2p/webrtc-star'
 
 const connectionGater = (): ConnectionGater => {
   return {
@@ -37,41 +39,17 @@ const connectionGater = (): ConnectionGater => {
 
 
 export async function libp2pDefaults (): Promise<Libp2pOptions<{ dht: DualKadDHT, pubsub: PubSub, identify: unknown, autoNAT: unknown }>> {
-  let list: string[]
+  let list: string[] = ['/ip4/127.0.0.1/tcp/8001/ws/p2p/12D3KooWKc8t4AH7pV1gTNecAhg5yFRGsYVjXVXPgxpnrBZ3JrVF']
+  const webRtcStar = webRTCStar()
 
   if (process.env.NODE_ENV === 'development') {
-    const controller = createController({
+    const client = await createController({
       kuboRpcModule: kuboRpcClient,
       test: true,
       endpoint: 'http://localhost:5001',
-      ipfsOptions: {
-        config: {
-          Addresses: {
-            Swarm: [
-              '/ip4/0.0.0.0/tcp/0',
-              '/ip4/0.0.0.0/tcp/0/ws'
-            ]
-          },
-          "API": {
-            "HTTPHeaders": {
-              "Access-Control-Allow-Headers": [
-                "X-Requested-With",
-                "Range",
-                "User-Agent"
-              ],
-              "Access-Control-Allow-Methods": [
-                "GET"
-              ],
-              "Access-Control-Allow-Origin": [
-                "*"
-              ]
-            }
-          }
-        }
-      }
     })
-    const addr = multiaddr()
-    list = ['/ip4/127.0.0.1/udp/4001/quic-v1/webtransport']
+    window.client = client
+    list = [...list, ...client.peer.addresses.map(String)]
   } else {
     // this list comes from https://github.com/ipfs/kubo/blob/da28fbc65a2e0f1ce59f9923823326ae2bc4f713/config/bootstrap_peers.go#L17
     list = [
@@ -93,15 +71,27 @@ export async function libp2pDefaults (): Promise<Libp2pOptions<{ dht: DualKadDHT
     : {
       connectionGater: connectionGater()
     }
+  
+  const dht = kadDHT({
+        clientMode: true,
+        validators: {
+          ipns: ipnsValidator
+        },
+        selectors: {
+          ipns: ipnsSelector
+        }
+      })
 
   return {
     addresses: {
       listen: [
-        '/webrtc'
+        '/dns4/libp2p-rdv.vps.revolunet.com/tcp/443/wss/p2p-webrtc-star/'
       ]
     },
     peerDiscovery: [
-      bootstrap({ list })
+      bootstrap({ list }),
+      // pubsubPeerDiscovery({ interval: 1000 })      
+      webRtcStar.discovery
     ],
     transports: [
       webRTC(),
@@ -110,7 +100,8 @@ export async function libp2pDefaults (): Promise<Libp2pOptions<{ dht: DualKadDHT
       webSockets({ filter: all }),
       circuitRelayTransport({
         discoverRelays: 1
-      })
+      }),
+      webRtcStar.transport
     ],
     connectionEncryption: [
       noise()
@@ -122,15 +113,7 @@ export async function libp2pDefaults (): Promise<Libp2pOptions<{ dht: DualKadDHT
     services: {
       identify: identifyService(),
       pubsub: gossipsub(),
-      dht: kadDHT({
-        clientMode: true,
-        validators: {
-          ipns: ipnsValidator
-        },
-        selectors: {
-          ipns: ipnsSelector
-        }
-      })
+      dht
     },
     ...production
   }
