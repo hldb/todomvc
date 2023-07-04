@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "build": "react-scripts build",
-    "start": "react-scripts start",
+    "build": "craco build",
+    "start": "craco start",
     "test": "npm run build && cypress run --browser chrome",
     "server": "node server.js"
   },
@@ -38,6 +38,8 @@
     "welo": "^2.0.0"
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@craco/types": "^7.1.0",
     "cypress": "^12.14.0",
     "react-scripts": "^5.0.1",
     "typescript": "^4.9.5"
