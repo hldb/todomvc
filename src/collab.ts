@@ -1,6 +1,6 @@
 import { createLibp2p } from 'libp2p'
 import { createHelia } from 'helia'
-import { createWelo, type Welo, type Manifest, type Database } from 'welo'
+import { createWelo, type Welo, type Manifest, type Database, Keyvalue } from 'welo'
 import { liveReplicator } from 'welo/dist/src/replicator/live'
 import { zzzyncReplicator, ZzzyncReplicator } from 'welo/dist/src/replicator/zzzync'
 import { Web3Storage } from 'web3.storage'
@@ -9,6 +9,9 @@ import type { Helia } from '@helia/interface'
 import { createLibp2pOptions } from './libp2p-options'
 import { multiaddr } from '@multiformats/multiaddr';
 import { peerIdFromString } from '@libp2p/peer-id'
+import { decode } from '@ipld/dag-cbor'
+import { TodoModel } from './todoModel'
+import { Key } from 'interface-datastore'
 
 const token = process.env.REACT_APP_W3_TOKEN
 let started = false
@@ -22,12 +25,18 @@ declare global {
     db: Database,
     multiaddr: any,
     peerIdFromString: any,
-    client: any
+    client: any,
+    render: any,
+    decode: any,
+    setTodos: any,
+    Key: any
   }
 }
 
 window.multiaddr = multiaddr
 window.peerIdFromString = peerIdFromString
+window.decode = decode
+window.Key = Key
 
 let 
   helia: Helia<any>,
@@ -35,10 +44,10 @@ let
   welo: Welo,
   manifest: Manifest,
   db: Database,
-  subscription: () => void
+  model: TodoModel
 
-export function subscribe (render: () => void) {
-  subscription = render
+export function attach (_model: TodoModel) {
+  model = _model
   void start()
 }
 // let first = true
@@ -71,12 +80,9 @@ export async function start (): Promise<void> {
   })
   db = await welo.open(manifest)
 
-  db.events.addEventListener('update', () => {
-    // 
-    
-    subscription()
-  })
+  void updateModel(db, model)
 
+  db.replica.events.addEventListener('update', updateModel.bind(undefined, db, model))
 
   window.helia = helia
   window.libp2p = libp2p
@@ -87,6 +93,23 @@ export async function start (): Promise<void> {
   started = true
   void putTodos(prestart.put)
   void delTodos(prestart.del)
+}
+
+const updateModel = async (db: Database, model: TodoModel): Promise<void> => {
+  await db.store.latest()
+  model.todos = await getTodos(db)
+  model.inform()
+}
+
+const getTodos = async (db: Database): Promise<ITodo[]> => {
+  const todos: ITodo[] = []
+  const store = db.store as Keyvalue
+  for await (const { value: cborTodo } of store.index.query({})) {
+    const value: ITodo = decode(cborTodo)
+    console.log(value)
+    if (value != null) todos.push(value)
+  }
+  return todos
 }
 
 const prestart: { put: ITodo[], del: ITodo[] } = {

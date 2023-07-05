@@ -43,8 +43,6 @@ class TodoModel implements ITodoModel {
     this.todos = this.todos.concat(todo);
 
     void collab.putTodos([todo])
-
-    this.inform();
   }
 
   public toggleAll(checked : Boolean) {
@@ -58,8 +56,6 @@ class TodoModel implements ITodoModel {
     this.todos = todos
 
     void collab.putTodos(todos)
-
-    this.inform();
   }
 
   public toggle(todoToToggle : ITodo) {
@@ -74,8 +70,6 @@ class TodoModel implements ITodoModel {
     });
 
     void collab.putTodos([toggled])
-
-    this.inform();
   }
 
   public destroy(todo : ITodo) {
@@ -84,8 +78,6 @@ class TodoModel implements ITodoModel {
     });
 
     void collab.delTodos([todo])
-
-    this.inform();
   }
 
   public save(todoToSave : ITodo, text : string) {
@@ -100,8 +92,6 @@ class TodoModel implements ITodoModel {
     });
 
     void collab.putTodos([saved])
-
-    this.inform();
   }
 
   public clearCompleted() {
@@ -111,8 +101,6 @@ class TodoModel implements ITodoModel {
     });
 
     void collab.delTodos(completed)
-
-    this.inform();
   }
 }
 

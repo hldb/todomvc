@@ -16,5 +16,5 @@ function render() {
 }
 
 model.subscribe(render);
-collab.subscribe(render);
+collab.attach(model);
 render();

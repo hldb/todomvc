@@ -16,7 +16,8 @@
         "outDir": "dist/src"
     },
     "include": [
-        "src"
+        "src",
+        "dht-server.js"
     ],
     "exclude": [],
     "baseUrl": "types",

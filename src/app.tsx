@@ -85,6 +85,7 @@ export class TodoApp extends React.Component<IAppProps, IAppState> {
     var footer;
     var main;
     const todos = this.props.model.todos;
+    console.log({ todos })
 
     var shownTodos = todos.filter((todo) => {
       switch (this.state.nowShowing) {
@@ -98,6 +99,7 @@ export class TodoApp extends React.Component<IAppProps, IAppState> {
     });
 
     var todoItems = shownTodos.map((todo) => {
+      console.log(todo)
       return (
         <TodoItem
           key={todo.id}
