@@ -8,9 +8,18 @@ import { ipnsSelector } from 'ipns/selector'
 import { ipnsValidator } from 'ipns/validator'
 import { bootstrap } from '@libp2p/bootstrap';
 import { addr } from './server-peer.js'
-import type { Libp2pOptions } from 'libp2p'
 import { DefaultIdentifyService } from 'libp2p/dist/src/identify/identify'
 import { ServiceMap } from '@libp2p/interface-libp2p'
+import * as filters from '@libp2p/websockets/filters'
+import { webSockets } from '@libp2p/websockets';
+import { mplex } from "@libp2p/mplex"
+import { webRTC, webRTCDirect } from '@libp2p/webrtc'
+import { webTransport } from '@libp2p/webtransport'
+import { circuitRelayTransport } from 'libp2p/circuit-relay'
+import type { Libp2pOptions } from 'libp2p'
+import type { ConnectionGater } from '@libp2p/interface-connection-gater'
+
+console.log(addr)
 
 interface Services extends ServiceMap {
   identify: DefaultIdentifyService,
@@ -18,19 +27,43 @@ interface Services extends ServiceMap {
   dht: DualKadDHT
 }
 
+const connectionGater = (): ConnectionGater => {
+  return {
+    denyDialPeer: async () => false,
+    denyDialMultiaddr: async () => false,
+    denyInboundConnection: async () => false,
+    denyOutboundConnection: async () => false,
+    denyInboundEncryptedConnection: async () => false,
+    denyOutboundEncryptedConnection: async () => false,
+    denyInboundUpgradedConnection: async () => false,
+    denyOutboundUpgradedConnection: async () => false,
+    filterMultiaddrForPeer: async () => true
+  }
+}
+
 export function createLibp2pOptions (opts: Libp2pOptions = {}): Libp2pOptions<Services> {
   const webRtcStar = webRTCStar()
 
   const options: Libp2pOptions = {
+    connectionGater: connectionGater(),
     addresses: {
       listen: [
-        // '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
+        // '/dns4/localhost/tcp/24642/ws/p2p-webrtc-star/'
+        '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
+        '/webrtc'
         // '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
-        // '/dns4/webrtc-star.discovery.libp2p.io/tcp/443/wss/p2p-webrtc-star/',
-        '/dns4/libp2p-rdv.vps.revolunet.com/tcp/443/wss/p2p-webrtc-star/'
+        // '/dns4/libp2p-rdv.vps.revolunet.com/tcp/443/wss/p2p-webrtc-star/'
+
       ]
     },
     transports: [
+      webSockets({ filter: filters.all }),
+      circuitRelayTransport({
+        discoverRelays: 1
+      }),
+      webRTC(),
+      webRTCDirect(),
+      webTransport(),
       webRtcStar.transport
     ],
     peerDiscovery: [
@@ -41,17 +74,14 @@ export function createLibp2pOptions (opts: Libp2pOptions = {}): Libp2pOptions<Se
       noise()
     ],
     streamMuxers: [
-      yamux()
+      mplex(),
+      yamux(),
     ],
-    connectionManager: {
-      maxParallelDials: 150, // 150 total parallel multiaddr dials
-      dialTimeout: 10e3 // 10 second dial timeout per peer dial
-    },
     services: {
       identify: identifyService(),
       pubsub: gossipsub({ emitSelf: true, allowPublishToZeroPeers: true }),
       dht: kadDHT({
-        clientMode: false,
+        clientMode: true,
         validators: { ipns: ipnsValidator },
         selectors: { ipns: ipnsSelector }
       })

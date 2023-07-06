@@ -12,6 +12,7 @@ import { peerIdFromString } from '@libp2p/peer-id'
 import { decode } from '@ipld/dag-cbor'
 import { TodoModel } from './todoModel'
 import { Key } from 'interface-datastore'
+import { addr } from './server-peer.js'
 
 const token = process.env.REACT_APP_W3_TOKEN
 let started = false
@@ -50,27 +51,19 @@ export function attach (_model: TodoModel) {
   model = _model
   void start()
 }
-// let first = true
 
 export async function start (): Promise<void> {
   libp2p = await createLibp2p(createLibp2pOptions())
   helia = await createHelia({ libp2p })
-  // libp2p.addEventListener('self:peer:update', (event) => {
-  //   console.log('addrs')
-  //   console.log(libp2p.getMultiaddrs())
-  //   if (first && event.detail.peer.addresses.length > 1) {
-  //     new Promise(resolve => setTimeout(resolve, 3000)).then(() => void download())
-  //     // void download()
-  //   }
-  // })
+
   welo = await createWelo({
     ipfs: helia,
     replicators: [
       liveReplicator(),
-      // zzzyncReplicator({
-      //   w3: { client: new Web3Storage({ token }) },
-      //   createEphemeralLibp2p: () => helia.libp2p // fine because there is only one database to replicate
-      // })
+      zzzyncReplicator({
+        w3: { client: new Web3Storage({ token }) },
+        createEphemeralLibp2p: () => helia.libp2p // fine because there is only one database to replicate
+      })
     ]
   })
   manifest = await welo.determine({
@@ -80,9 +73,21 @@ export async function start (): Promise<void> {
   })
   db = await welo.open(manifest)
 
+  if (libp2p.getMultiaddrs().length === 3) {
+    await download(db)
+  } else {
+    libp2p.addEventListener('self:peer:update', (event) => {
+      if (event.detail.peer.addresses.length === 2) {
+        console.log('download')
+        void download(db)
+      }
+    })
+  }
+
   void updateModel(db, model)
 
   db.replica.events.addEventListener('update', updateModel.bind(undefined, db, model))
+  db.replica.events.addEventListener('update', uploadChanges.bind(undefined, db))
 
   window.helia = helia
   window.libp2p = libp2p
@@ -110,6 +115,17 @@ const getTodos = async (db: Database): Promise<ITodo[]> => {
     if (value != null) todos.push(value)
   }
   return todos
+}
+
+const uploadChanges = async (db: Database): Promise<void> => {
+  const zzzync = db.replicators.filter(r => r instanceof ZzzyncReplicator)[0] as ZzzyncReplicator | undefined
+
+  if (zzzync != null) {
+    return
+  }
+
+  await zzzync.upload()
+  console.log('uploaded replica')
 }
 
 const prestart: { put: ITodo[], del: ITodo[] } = {
@@ -141,14 +157,14 @@ export async function delTodos (todos: ITodo[]): Promise<void> {
   }
 }
 
-// async function download () {
-//   for (const replicator of db.replicators) {
-//     if (replicator instanceof ZzzyncReplicator) {
-//       console.log(helia.libp2p.getMultiaddrs())
-//       void replicator.download()
-//         .then(() => console.log('no way...'))
-//         .catch(() => console.log('yes way'))
-//     }
-//   }
-// }
-// 
+async function download (db: Database) {
+  for (const replicator of db.replicators) {
+    if (replicator instanceof ZzzyncReplicator) {
+      console.log(helia.libp2p.getMultiaddrs())
+      void replicator.download()
+        .then(() => console.log('no way...'))
+        .catch(() => console.log('yes way'))
+    }
+  }
+}
+
