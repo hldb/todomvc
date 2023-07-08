@@ -62,7 +62,8 @@ export async function start (): Promise<void> {
       liveReplicator(),
       zzzyncReplicator({
         w3: { client: new Web3Storage({ token }) },
-        createEphemeralLibp2p: () => helia.libp2p // fine because there is only one database to replicate
+        createEphemeralLibp2p: () => helia.libp2p, // fine because there is only one database to replicate
+        scope: 'lan' // only checking the lan dht for dcids
       })
     ]
   })
@@ -77,7 +78,7 @@ export async function start (): Promise<void> {
     await download(db)
   } else {
     libp2p.addEventListener('self:peer:update', (event) => {
-      if (event.detail.peer.addresses.length === 2) {
+      if (event.detail.peer.addresses.length === 3) {
         console.log('download')
         void download(db)
       }
@@ -120,10 +121,11 @@ const getTodos = async (db: Database): Promise<ITodo[]> => {
 const uploadChanges = async (db: Database): Promise<void> => {
   const zzzync = db.replicators.filter(r => r instanceof ZzzyncReplicator)[0] as ZzzyncReplicator | undefined
 
-  if (zzzync != null) {
+  if (zzzync == null) {
     return
   }
 
+  console.log('upload')
   await zzzync.upload()
   console.log('uploaded replica')
 }
@@ -163,7 +165,7 @@ async function download (db: Database) {
       console.log(helia.libp2p.getMultiaddrs())
       void replicator.download()
         .then(() => console.log('no way...'))
-        .catch(() => console.log('yes way'))
+        .catch((e) => console.log({ download_error: e }))
     }
   }
 }
