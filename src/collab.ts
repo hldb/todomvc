@@ -72,18 +72,22 @@ export async function start (): Promise<void> {
     protocol: 'keyvalue',
     access: { protocol: '/hldb/access/static', config: { write: ['*'] } }
   })
-  db = await welo.open(manifest)
+  db = await welo.open(manifest, { provider: libp2p.peerId })
 
-  if (libp2p.getMultiaddrs().length === 3) {
-    await download(db)
-  } else {
-    libp2p.addEventListener('self:peer:update', (event) => {
-      if (event.detail.peer.addresses.length === 3) {
-        console.log('download')
-        void download(db)
-      }
-    })
+  const initialDownload = async (num: number) => {
+    if (num === 3) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await libp2p.dialProtocol(addr, '/ipfs/lan/kad/1.0.0')
+      await download(db)
+    } else {
+      libp2p.addEventListener(
+        'self:peer:update',
+        (event) => initialDownload(event.detail.peer.addresses.length),
+        { once: true }
+      )
+    }
   }
+  initialDownload(libp2p.getMultiaddrs().length)
 
   void updateModel(db, model)
 
@@ -127,6 +131,7 @@ const uploadChanges = async (db: Database): Promise<void> => {
 
   console.log('upload')
   await zzzync.upload()
+
   console.log('uploaded replica')
 }
 
