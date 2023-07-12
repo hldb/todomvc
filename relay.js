@@ -12,14 +12,6 @@ import { ipnsSelector } from 'ipns/selector'
 import { ipnsValidator } from 'ipns/validator'
 import { id, addr } from "./src/server-peer.js"
 
-// import { sigServer } from '@libp2p/webrtc-star-signalling-server'
-// const signalServerOptions = {
-//   port: 24642,
-//   host: '127.0.0.1',
-//   metrics: false
-// }
-// await sigServer(signalServerOptions)
-
 const server = await createLibp2p({
   peerId: id,
   addresses: {

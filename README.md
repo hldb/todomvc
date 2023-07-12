@@ -1,83 +1,59 @@
-# TypeScript & React TodoMVC Example
+# todomvc
 
-> TypeScript is a language for application-scale JavaScript development. TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. Any browser. Any host. Any OS. Open Source.
+> uses online and offline replication to create preserved and real-time P2P applications
 
-> _[TypeScript - typescriptlang.org](http://typescriptlang.org)_
+**Web app base is from [todomvc.com](todomvc.com)**
 
-> React is a JavaScript library for creating user interfaces. Its core principles are declarative code, efficiency, and flexibility. Simply specify what your component looks like and React will keep it up-to-date when the underlying data changes.
+## Running the demo
 
-> _[React - facebook.github.io/react](http://facebook.github.io/react)_
+**DEMO STILL BROKE, NEED TO FIX SOME THINGS IN ZZZYNC REPLICATORS UPLOAD METHOD**
 
-## Learning TypeScript
+> Have only tested the webapp using chromium browsers.
 
-The [TypeScript website](http://typescriptlang.org) is a great resource for getting started.
+### Prerequisites
 
-Here are some links you may find helpful:
+- web3.storage API token
 
-* [Tutorial](http://www.typescriptlang.org/Tutorial)
-* [Code Playground](http://www.typescriptlang.org/Playground)
-* [Documentation](https://github.com/Microsoft/TypeScript/wiki)
-* [Applications built with TypeScript](http://www.typescriptlang.org/Samples)
-* [Blog](http://blogs.msdn.com/b/typescript)
-* [Source Code](https://github.com/Microsoft/TypeScript)
+### Create .env file
 
-Articles and guides from the community:
+In the project root create a file named `.env` and write:
 
-* [Thoughts on TypeScript](http://www.nczonline.net/blog/2012/10/04/thoughts-on-typescript)
-* [ScreenCast - Why I Like TypeScript](https://www.youtube.com/watch?v=Mh5VQVfWTbs)
+```
+REACT_APP_W3_TOKEN='<web3.storage token>'
+```
 
-Get help from other TypeScript users:
+### Start Circuit-Relay Server
 
-* [TypeScript on StackOverflow](http://stackoverflow.com/questions/tagged/typescript)
-* [Forums](https://github.com/Microsoft/TypeScript/issues)
-* [TypeScript on Twitter](http://twitter.com/typescriptlang)
+In a separate prompt, start a local relay-server using the command:
 
-_If you have other helpful links to share, or find any of the links above no longer work, please [let us know](https://github.com/tastejs/todomvc/issues)._
+```bash
+$ npm run relay
+```
 
-## Learning React
+### Start Dev Server
 
-The [React getting started documentation](http://facebook.github.io/react/docs/getting-started.html) is a great way to get started.
+In a separate terminal, start hosting the webapp locally by using the command:
 
-Here are some links you may find helpful:
+```bash
+$ npm run start
+```
 
-* [Documentation](http://facebook.github.io/react/docs/getting-started.html)
-* [API Reference](http://facebook.github.io/react/docs/reference.html)
-* [Blog](http://facebook.github.io/react/blog/)
-* [React on GitHub](https://github.com/facebook/react)
-* [Support](http://facebook.github.io/react/support.html)
+### Testing Live Replication
 
-Articles and guides from the community:
+Using a browser, navigate to `localhost:3000`. Open another tab for the same url.
 
-* [How is Facebook's React JavaScript library](http://www.quora.com/React-JS-Library/How-is-Facebooks-React-JavaScript-library)
-* [React: Under the hood](http://www.quora.com/Pete-Hunt/Posts/React-Under-the-Hood)
+Begin making changes on either side. After a few moments the browser clients should find eachother over pubsub and updates can be observed immediately on the other side. Open more tabs if you like.
 
-Get help from other React users:
+### Testing Offline Replication
 
-* [React on StackOverflow](http://stackoverflow.com/questions/tagged/reactjs)
-* [Discussion Forum](https://discuss.reactjs.org/)
+Using a browser, navigate to `localhost:3000`.
 
-_If you have other helpful links to share, or find any of the links above no longer work, please [let us know](https://github.com/tastejs/todomvc/issues)._
+Make changes to the todo list. Wait a moment for the changes to be uploaded. (not currently part of the UI but upload events can be observed in the console)
 
+Reload the tab, this will wipe all previous data. After the new browser libp2p instance has connected to the local circuit-relay server the changes advertised by the previous instance can be queried from the dht, then w3name, and finally pulled from web3.storage.
 
+## Demo topology
 
-## Running
-
-A standalone TypeScript compiler is available on NPM.
-
-	npm install typescript
-
-To compile the TypeScript in this project:
-
-	# from examples/typescript-react
-	$ ./node_modules/typescript/bin/tsc -p ./js/
-
-To be able to run the output JS files in the browser:
-
-	# from examples/typescript-react
-	$ ./node_modules/browserify/bin/cmd ./js/app.js -o ./js/bundle.js"
-
-To run the app, spin up an HTTP server (e.g. `python -m SimpleHTTPServer`) and visit http://localhost/.../myexample/.
-Alternatively you can run:
-
-	# from examples/typescript-react
-	$ npm run start
+There is helia instance running in the browser which connects to public dev webrtc-star servers.
+The browser clients also connect to a local circuit-relay server, clients use the `/webrtc` multiaddr to write to the lan DHT.
+Clients will upload their immutable changes to web3.storage and advertise them either over pubsub with other online peers, or using the DHT and w3name for later use by currently offline peers.
