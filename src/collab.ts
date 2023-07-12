@@ -4,14 +4,15 @@ import { createWelo, type Welo, type Manifest, type Database, Keyvalue } from 'w
 import { liveReplicator } from 'welo/dist/src/replicator/live'
 import { zzzyncReplicator, ZzzyncReplicator } from 'welo/dist/src/replicator/zzzync'
 import { Web3Storage } from 'web3.storage'
-import type { Libp2p } from 'libp2p'
-import type { Helia } from '@helia/interface'
-import { createLibp2pOptions } from './libp2p-options'
 import { multiaddr } from '@multiformats/multiaddr';
 import { peerIdFromString } from '@libp2p/peer-id'
 import { decode } from '@ipld/dag-cbor'
-import { TodoModel } from './todoModel'
 import { Key } from 'interface-datastore'
+import type { Libp2p } from 'libp2p'
+import type { Helia } from '@helia/interface'
+import type { Ed25519PeerId } from '@libp2p/interface-peer-id'
+import { createLibp2pOptions } from './libp2p-options'
+import { TodoModel } from './todoModel'
 import { addr } from './server-peer.js'
 
 const token = process.env.REACT_APP_W3_TOKEN
@@ -72,7 +73,7 @@ export async function start (): Promise<void> {
     protocol: 'keyvalue',
     access: { protocol: '/hldb/access/static', config: { write: ['*'] } }
   })
-  db = await welo.open(manifest, { provider: libp2p.peerId })
+  db = await welo.open(manifest, { provider: libp2p.peerId as Ed25519PeerId })
 
   const initialDownload = async (num: number) => {
     if (num === 3) {
@@ -168,9 +169,7 @@ async function download (db: Database) {
   for (const replicator of db.replicators) {
     if (replicator instanceof ZzzyncReplicator) {
       console.log(helia.libp2p.getMultiaddrs())
-      void replicator.download()
-        .then(() => console.log('no way...'))
-        .catch((e) => console.log({ download_error: e }))
+      await replicator.download()
     }
   }
 }
