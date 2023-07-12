@@ -19,7 +19,7 @@
 In the project root create a file named `.env` and write:
 
 ```
-REACT_APP_W3_TOKEN='<web3.storage token>'
+REACT_APP_W3_TOKEN='<replace this with your web3.storage token>'
 ```
 
 ### Start Circuit-Relay Server
