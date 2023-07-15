@@ -4,7 +4,7 @@
     "build": "craco build",
     "start": "craco start",
     "test": "npm run build && cypress run --browser chrome",
-    "relay": "node ./relay.js"
+    "relay": "DEBUG=libp2p:circuit-relay:* node relay.js"
   },
   "type": "module",
   "dependencies": {
