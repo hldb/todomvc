@@ -17,7 +17,7 @@
     },
     "include": [
         "src",
-        "dht-server.js"
+        "relay.js"
     ],
     "exclude": [],
     "baseUrl": "types",
