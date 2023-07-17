@@ -13,7 +13,8 @@ import type { Helia } from '@helia/interface'
 import type { Ed25519PeerId } from '@libp2p/interface-peer-id'
 import { createLibp2pOptions } from './libp2p-options'
 import { TodoModel } from './todoModel'
-import { addr } from './server-peer.js'
+import * as cbor from '@ipld/dag-cbor'
+import { EntryInstance } from 'welo/dist/src/entry/interface'
 
 const token = process.env.REACT_APP_W3_TOKEN
 let started = false
@@ -31,7 +32,8 @@ declare global {
     render: any,
     decode: any,
     setTodos: any,
-    Key: any
+    Key: any,
+    cbor: any
   }
 }
 
@@ -39,6 +41,7 @@ window.multiaddr = multiaddr
 window.peerIdFromString = peerIdFromString
 window.decode = decode
 window.Key = Key
+window.cbor = cbor
 
 let 
   helia: Helia<any>,
@@ -63,7 +66,8 @@ export async function start (): Promise<void> {
       liveReplicator(),
       zzzyncReplicator({
         w3: { client: new Web3Storage({ token }) },
-        createEphemeralLibp2p: () => helia.libp2p, // fine because there is only one database to replicate
+        // @ts-expect-error
+        createEphemeralLibp2p: () => ({ libp2p: helia.libp2p }), // fine because there is only one database to replicate
         scope: 'lan' // only checking the lan dht for dcids
       })
     ]
@@ -77,8 +81,8 @@ export async function start (): Promise<void> {
 
   const initialDownload = async (num: number) => {
     if (num === 3) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await libp2p.dialProtocol(addr, '/ipfs/lan/kad/1.0.0')
+      // await new Promise(resolve => setTimeout(resolve, 1000))
+      // await libp2p.dialProtocol(addr, '/ipfs/lan/kad/1.0.0')
       await download(db)
     } else {
       libp2p.addEventListener(
@@ -93,7 +97,7 @@ export async function start (): Promise<void> {
   void updateModel(db, model)
 
   db.replica.events.addEventListener('update', updateModel.bind(undefined, db, model))
-  db.replica.events.addEventListener('update', uploadChanges.bind(undefined, db))
+  db.replica.events.addEventListener('update', throttledUpload.bind(undefined, db))
 
   window.helia = helia
   window.libp2p = libp2p
@@ -102,8 +106,6 @@ export async function start (): Promise<void> {
   window.db = db
 
   started = true
-  void putTodos(prestart.put)
-  void delTodos(prestart.del)
 }
 
 const updateModel = async (db: Database, model: TodoModel): Promise<void> => {
@@ -123,6 +125,25 @@ const getTodos = async (db: Database): Promise<ITodo[]> => {
   return todos
 }
 
+let uploading: Promise<unknown> | null = null 
+let nextUpload: () => Promise<unknown> | null = null
+
+const throttledUpload = async (db: Database): Promise<void> => {
+  const _uploadChanges = () => uploadChanges(db).then(() => {
+    uploading = null
+    if (nextUpload != null) {
+      uploading = nextUpload()
+      nextUpload = null
+    }
+  })
+  if (uploading == null) {
+    uploading = _uploadChanges()
+  } else {
+    nextUpload = _uploadChanges
+  }
+}
+
+
 const uploadChanges = async (db: Database): Promise<void> => {
   const zzzync = db.replicators.filter(r => r instanceof ZzzyncReplicator)[0] as ZzzyncReplicator | undefined
 
@@ -136,33 +157,22 @@ const uploadChanges = async (db: Database): Promise<void> => {
   console.log('uploaded replica')
 }
 
-const prestart: { put: ITodo[], del: ITodo[] } = {
-  put: [],
-  del: []
-}
-
 export async function putTodos (todos: ITodo[]): Promise<void> {
-  if (started === false)  {
-    prestart.put.push(...todos)
-    return
-  }
-
+  const entries: Array<Promise<EntryInstance<any>>> = []
   for (const todo of todos) {
     const payload = db.store.creators.put(todo.id, todo)
-    void db.replica.write(payload)
+    entries.push(db.replica.newEntry(payload))
   }
+  void db.replica.add(await Promise.all(entries))
 }
 
 export async function delTodos (todos: ITodo[]): Promise<void> {
-  if (started === false)  {
-    prestart.del.push(...todos)
-    return
-  }
-
+  const entries: Array<Promise<EntryInstance<any>>> = []
   for (const todo of todos) {
     const payload = db.store.creators.del(todo.id, todo)
-    void db.replica.write(payload)
+    entries.push(db.replica.newEntry(payload))
   }
+  void db.replica.add(await Promise.all(entries))
 }
 
 async function download (db: Database) {

@@ -98,21 +98,28 @@ export class TodoApp extends React.Component<IAppProps, IAppState> {
       }
     });
 
-    var todoItems = shownTodos.map((todo) => {
-      console.log(todo)
-      return (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onToggle={this.toggle.bind(this, todo)}
-          onDestroy={this.destroy.bind(this, todo)}
-          onEdit={this.edit.bind(this, todo)}
-          editing={this.state.editing === todo.id}
-          onSave={this.save.bind(this, todo)}
-          onCancel={ e => this.cancel() }
-        />
-      );
-    });
+    var todoItems = shownTodos
+      .sort((a: ITodo, b: ITodo) => {
+        if (a.id > b.id) {
+          return 1
+        } else {
+          return -1
+        }
+      })
+      .map((todo) => {
+        return (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onToggle={this.toggle.bind(this, todo)}
+            onDestroy={this.destroy.bind(this, todo)}
+            onEdit={this.edit.bind(this, todo)}
+            editing={this.state.editing === todo.id}
+            onSave={this.save.bind(this, todo)}
+            onCancel={ e => this.cancel() }
+          />
+        );
+      });
 
     // Note: It's usually better to use immutable data structures since they're
     // easier to reason about and React works very well with them. That's why
