@@ -1,8 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "build": "craco build",
-    "start": "craco start",
+    "build": "tsc && vite build",
+    "start": "vite",
+    "serve": "vite preview",
+    "postinstall": "patch-package",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "npm run build && cypress run --browser chrome",
     "relay": "DEBUG=libp2p:circuit-relay:* node relay.js"
   },
@@ -29,8 +33,8 @@
     "ipns": "^6.0.0",
     "kubo-rpc-client": "^3.0.1",
     "libp2p": "^0.45.3",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "todomvc-app-css": "^2.0.0",
     "todomvc-common": "^1.0.1",
     "typescript": "^4.8.4",
@@ -40,9 +44,13 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@craco/types": "^7.1.0",
+    "@vitejs/plugin-react": "^4.0.3",
     "cypress": "^12.14.0",
-    "react-scripts": "^5.0.1",
-    "typescript": "^4.9.5"
+    "prettier": "3.0.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.4.4",
+    "vite-plugin-svgr": "^3.2.0",
+    "vite-tsconfig-paths": "^4.2.0"
   },
   "homepage": "./",
   "browserslist": {
