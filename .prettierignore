@@ -1,0 +1,7 @@
+build
+coverage
+node_modules
+**/*.html
+.env*.local
+package-lock.json
+package.json

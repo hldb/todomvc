@@ -1,0 +1,12 @@
+diff --git a/node_modules/ipfs-bitswap/dist/src/utils/sorted-map.d.ts b/node_modules/ipfs-bitswap/dist/src/utils/sorted-map.d.ts
+index 49f5e4a..8f90bbb 100644
+--- a/node_modules/ipfs-bitswap/dist/src/utils/sorted-map.d.ts
++++ b/node_modules/ipfs-bitswap/dist/src/utils/sorted-map.d.ts
+@@ -21,6 +21,7 @@ export declare class SortedMap<Key, Value> extends Map<Key, Value> {
+     values(): IterableIterator<Value>;
+     entries(): IterableIterator<[Key, Value]>;
+     [Symbol.iterator](): IterableIterator<[Key, Value]>;
++      // @ts-expect-error - Callback in Map forEach is (V, K, Map<K, V>) => void
+     forEach(cb: (entry: [Key, Value]) => void, thisArg?: SortedMap<Key, Value>): void;
+     _defaultSort(a: [Key, Value], b: [Key, Value]): 0 | 1 | -1;
+     _kCmp(a: Key, b: Key): number;
