@@ -81,8 +81,6 @@ export async function start (): Promise<void> {
 
   const initialDownload = async (num: number) => {
     if (num === 2) {
-      // await new Promise(resolve => setTimeout(resolve, 1000))
-      // await libp2p.dialProtocol(addr, '/ipfs/lan/kad/1.0.0')
       await download(db)
     } else {
       libp2p.addEventListener(
@@ -119,7 +117,6 @@ const getTodos = async (db: Database): Promise<ITodo[]> => {
   const store = db.store as Keyvalue
   for await (const { value: cborTodo } of store.index.query({})) {
     const value: ITodo = decode(cborTodo)
-    console.log(value)
     if (value != null) todos.push(value)
   }
   return todos
@@ -151,9 +148,7 @@ const uploadChanges = async (db: Database): Promise<void> => {
     return
   }
 
-  console.log('upload')
   await zzzync.upload()
-
   console.log('uploaded replica')
 }
 
