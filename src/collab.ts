@@ -80,7 +80,7 @@ export async function start (): Promise<void> {
   db = await welo.open(manifest, { provider: libp2p.peerId as Ed25519PeerId })
 
   const initialDownload = async (num: number) => {
-    if (num === 3) {
+    if (num === 2) {
       // await new Promise(resolve => setTimeout(resolve, 1000))
       // await libp2p.dialProtocol(addr, '/ipfs/lan/kad/1.0.0')
       await download(db)
