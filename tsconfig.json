@@ -14,7 +14,8 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "ignoreDeprecations": "5.0",
-        "outDir": "dist/src"
+        "outDir": "dist/src",
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "src",
