@@ -30,6 +30,26 @@ In a separate prompt, start a local relay-server using the command:
 $ npm run relay
 ```
 
+It may take a minute or two before the relay server can be used by the browser clients.
+Everything should be functional after seeing a debug log like this:
+
+```bash
+  libp2p:circuit-relay:advert-service:error could not advertise service AbortError: Query was aborted before self-query ran
+    at EventTarget.<anonymous> (file:///home/tabcat/github/hldb/todomvc/node_modules/@libp2p/kad-dht/dist/src/query/manager.js:104:36)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:731:20)
+    at EventTarget.dispatchEvent (node:internal/event_target:673:26)
+    at abortSignal (node:internal/abort_controller:308:10)
+    at AbortController.abort (node:internal/abort_controller:338:5)
+    at EventTarget.onAbort (file:///home/tabcat/github/hldb/todomvc/node_modules/any-signal/dist/src/index.js:8:20)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:731:20)
+    at EventTarget.dispatchEvent (node:internal/event_target:673:26)
+    at abortSignal (node:internal/abort_controller:308:10)
+    at Timeout._onTimeout (node:internal/abort_controller:115:7) {
+  code: 'ABORT_ERR',
+  type: 'aborted'
+} +0ms
+```
+
 ### Start Dev Server
 
 In a separate terminal, start hosting the webapp locally by using the command:
