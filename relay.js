@@ -25,7 +25,9 @@ const server = await createLibp2p({
   services: {
     identify: identifyService(),
     pubsub: gossipsub(),
-    circuitRelayServer: circuitRelayServer({ advertise: true }),
+    circuitRelayServer: circuitRelayServer({
+      advertise: { bootDelay: 10 }
+    }),
     dht: kadDHT({
       clientMode: false,
       validators: { ipns: ipnsValidator },
