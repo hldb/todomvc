@@ -11,8 +11,6 @@ https://github.com/hldb/todomvc/assets/1173416/daeeeefc-ea07-42ff-ad2f-f78b06e40
 
 ## Running the demo
 
-**DEMO STILL BROKE, NEED TO FIX SOME THINGS IN ZZZYNC REPLICATORS UPLOAD METHOD**
-
 > Have only tested the webapp using chromium browsers.
 
 ### Prerequisites
