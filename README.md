@@ -4,6 +4,11 @@
 
 **Web app base is from [todomvc.com](todomvc.com)**
 
+## Demo video
+
+https://github.com/hldb/todomvc/assets/1173416/daeeeefc-ea07-42ff-ad2f-f78b06e404b0
+
+
 ## Running the demo
 
 **DEMO STILL BROKE, NEED TO FIX SOME THINGS IN ZZZYNC REPLICATORS UPLOAD METHOD**
