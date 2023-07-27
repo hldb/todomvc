@@ -19,7 +19,7 @@
     },
     "include": [
         "src",
-        "relay.js"
+        "relay.mjs"
     ],
     "exclude": [],
     "baseUrl": "types",
