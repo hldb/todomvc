@@ -1,6 +1,6 @@
 # todomvc
 
-> uses online and offline replication to create preserved and real-time P2P applications
+> uses online and offline replication to create real-time and perserved P2P applications
 
 **Web app base is from [todomvc.com](todomvc.com)**
 
