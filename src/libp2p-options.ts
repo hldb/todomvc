@@ -6,7 +6,7 @@ import { identifyService } from 'libp2p/identify'
 import { ipnsSelector } from 'ipns/selector'
 import { ipnsValidator } from 'ipns/validator'
 import { bootstrap } from '@libp2p/bootstrap';
-import { addr } from './server-peer.js'
+import { addr } from './server-peer.mjs'
 import { DefaultIdentifyService } from 'libp2p/dist/src/identify/identify'
 import { ServiceMap } from '@libp2p/interface-libp2p'
 import * as filters from '@libp2p/websockets/filters'

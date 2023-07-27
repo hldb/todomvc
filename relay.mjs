@@ -10,7 +10,7 @@ import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import { kadDHT } from "@libp2p/kad-dht"
 import { ipnsSelector } from 'ipns/selector'
 import { ipnsValidator } from 'ipns/validator'
-import { id, addr } from "./src/server-peer.js"
+import { id, addr } from "./src/server-peer.mjs"
 
 const server = await createLibp2p({
   peerId: id,
