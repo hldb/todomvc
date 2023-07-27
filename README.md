@@ -4,7 +4,7 @@
 
 **Web app base is from [todomvc.com](todomvc.com)**
 
-Build using [welo](https://github.com/hldb/welo) and [zzzync](https://github.com/tabcat/zzzync)
+Built with [welo](https://github.com/hldb/welo)
 
 ## Demo video
 
