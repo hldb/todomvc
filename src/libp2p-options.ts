@@ -73,7 +73,8 @@ export function createLibp2pOptions (opts: Libp2pOptions = {}): Libp2pOptions<Se
         validators: { ipns: ipnsValidator },
         selectors: { ipns: ipnsSelector }
       })
-    }
+    },
+    ...opts
   }
 
   return options

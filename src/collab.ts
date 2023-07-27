@@ -15,6 +15,8 @@ import { createLibp2pOptions } from './libp2p-options'
 import { TodoModel } from './todoModel'
 import * as cbor from '@ipld/dag-cbor'
 import { EntryInstance } from 'welo/dist/src/entry/interface'
+import { IDBDatastore } from 'datastore-idb'
+import { IDBBlockstore } from 'blockstore-idb'
 
 const token = process.env.REACT_APP_W3_TOKEN
 let started = false
@@ -57,8 +59,16 @@ export function attach (_model: TodoModel) {
 }
 
 export async function start (): Promise<void> {
-  libp2p = await createLibp2p(createLibp2pOptions())
-  helia = await createHelia({ libp2p })
+  const datastore = new IDBDatastore('datastore')
+  const blockstore = new IDBBlockstore('blockstore')
+  await datastore.open()
+  await blockstore.open()
+  libp2p = await createLibp2p(createLibp2pOptions({ datastore }))
+  helia = await createHelia({
+    datastore,
+    blockstore,
+    libp2p
+  })
 
   welo = await createWelo({
     ipfs: helia,

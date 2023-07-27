@@ -43,10 +43,6 @@ class Utils {
     }
     return newObj;
   }
-
-  public static purge(namespace : string) {
-    localStorage.removeItem(namespace)
-  }
 }
 
 export { Utils };

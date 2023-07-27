@@ -5,12 +5,9 @@ import * as ReactDOM from "react-dom";
 import { TodoApp } from "./app";
 import { TodoModel } from "./todoModel";
 import * as collab from './collab'
-import { Utils } from "./utils";
 
 const namespace = 'react-todos';
-Utils.purge(namespace);
 var model = new TodoModel(namespace);
-
 
 function render() {
   ReactDOM.render(
