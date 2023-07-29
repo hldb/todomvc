@@ -8,8 +8,7 @@ Built with [welo](https://github.com/hldb/welo)
 
 ## Demo video
 
-https://github.com/hldb/todomvc/assets/1173416/daeeeefc-ea07-42ff-ad2f-f78b06e404b0
-
+https://github.com/hldb/todomvc/assets/36933094/dd2e9268-9508-4e60-9569-42b5e99045ec
 
 ## Running the demo
 
